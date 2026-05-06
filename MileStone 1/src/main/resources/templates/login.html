@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — ShopZone</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="nav-logo">SHOP<span>ZONE</span></a>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-left">
+    <div class="auth-big-text">ACCESS<br/>YOUR<br/>ACCOUNT</div>
+    <p style="font-size:0.68rem;color:#333;letter-spacing:0.15em;text-transform:uppercase;margin-top:2rem;">
+      MEMBERS GET EXCLUSIVE ACCESS<br/>TO NEW DROPS & OFFERS
+    </p>
+  </div>
+  <div class="auth-right">
+    <h1 class="auth-title">WELCOME</h1>
+    <p class="auth-sub">SIGN IN OR CREATE AN ACCOUNT TO CONTINUE</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">LOGIN</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">REGISTER</button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <!-- Login -->
+    <form id="form-login" th:action="@{/auth/login}" method="post">
+      <input type="hidden" name="redirect" th:value="${redirect != null ? redirect : '/'}"/>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" required placeholder="you@example.com" class="form-input"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" required placeholder="••••••••" class="form-input"/>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top:0.5rem;">SIGN IN →</button>
+    </form>
+
+    <!-- Register -->
+    <form id="form-register" th:action="@{/auth/register}" method="post" class="hidden-form" style="display:none;">
+      <input type="hidden" name="redirect" th:value="${redirect != null ? redirect : '/'}"/>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="name" required placeholder="Your name" class="form-input"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" required placeholder="you@example.com" class="form-input"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" required minlength="6" placeholder="Min. 6 characters" class="form-input"/>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top:0.5rem;">CREATE ACCOUNT →</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function switchTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('form-login').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('form-register').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  }
+</script>
+</body>
+</html>

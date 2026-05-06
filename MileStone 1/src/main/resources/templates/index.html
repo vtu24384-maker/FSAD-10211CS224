@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopZone</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="nav-logo">SHOP<span>ZONE</span></a>
+  <div class="nav-links">
+    <span th:if="${userName}" style="font-size:0.72rem;color:#555;letter-spacing:0.1em;" th:text="${userName}"></span>
+    <a th:if="${userName}" th:href="@{/logout}" class="nav-link">Logout</a>
+    <a th:unless="${userName}" th:href="@{/login}" class="nav-link">Login</a>
+    <a th:href="@{/cart}" class="nav-cart">
+      Cart <span class="cart-badge" id="cart-count">0</span>
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-left">
+    <div>
+      <p class="hero-tag">EST. 2025 — TECH COLLECTION</p>
+    </div>
+    <div>
+      <h1 class="hero-title">SHOP<br/><span>ZONE</span></h1>
+    </div>
+    <div>
+      <p class="hero-sub">QUALITY GUARANTEED — UNITED TERMS<br/>DESIGNED FOR PEOPLE WHO MOVE WITH INTENT — ANYWHERE.</p>
+      <a th:href="@{#products}" class="hero-cta" style="margin-top:1.5rem;">
+        SHOP NOW →
+      </a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800" alt="hero" onerror="this.style.display='none'"/>
+    <div class="hero-est">*EST.25</div>
+  </div>
+</section>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">FREE SHIPPING OVER ₹999</span>
+    <span class="ticker-item">QUALITY GUARANTEED</span>
+    <span class="ticker-item">EASY RETURNS</span>
+    <span class="ticker-item">SECURE CHECKOUT</span>
+    <span class="ticker-item">NEW ARRIVALS WEEKLY</span>
+    <span class="ticker-item">FREE SHIPPING OVER ₹999</span>
+    <span class="ticker-item">QUALITY GUARANTEED</span>
+    <span class="ticker-item">EASY RETURNS</span>
+    <span class="ticker-item">SECURE CHECKOUT</span>
+    <span class="ticker-item">NEW ARRIVALS WEEKLY</span>
+  </div>
+</div>
+
+<!-- Products -->
+<section class="section" id="products">
+  <div class="section-header">
+    <h2 class="section-title">ALL PRODUCTS</h2>
+    <span class="section-count" id="product-count"></span>
+  </div>
+  <div class="products-grid">
+    <div th:each="p : ${products}" class="product-card">
+      <div class="product-img">
+        <img th:src="${p.image}" th:alt="${p.name}"
+             onerror="this.src='https://placehold.co/400x500/111/333?text=NO+IMAGE'"/>
+        <span th:class="${p.stock == 0 ? 'product-badge badge-out' : 'product-badge badge-in'}"
+              th:text="${p.stock == 0 ? 'SOLD OUT' : 'IN STOCK'}"></span>
+      </div>
+      <div class="product-info">
+        <div class="product-name" th:text="${p.name}"></div>
+        <div class="product-desc" th:text="${p.description}"></div>
+        <div class="product-footer">
+          <span class="product-price">₹<span th:text="${#numbers.formatDecimal(p.price,1,2)}"></span></span>
+          <span class="product-stock" th:text="${p.stock > 0 ? p.stock + ' LEFT' : ''}"></span>
+        </div>
+        <form th:action="@{/cart/add}" method="post">
+          <input type="hidden" name="productId" th:value="${p.id}"/>
+          <button type="submit"
+                  th:disabled="${p.stock == 0}"
+                  th:class="${p.stock == 0 ? 'btn-add btn-add-disabled' : 'btn-add btn-add-active'}"
+                  th:text="${p.stock == 0 ? 'SOLD OUT' : 'ADD TO CART'}">
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="toast">✓ ADDED TO CART</div>
+
+<footer>
+  <span class="footer-logo">SHOPZONE</span>
+  <span class="footer-copy">© 2025 SHOPZONE. ALL RIGHTS RESERVED.</span>
+</footer>
+
+<script>
+  document.getElementById('product-count').textContent =
+    document.querySelectorAll('.product-card').length + ' ITEMS';
+</script>
+</body>
+</html>

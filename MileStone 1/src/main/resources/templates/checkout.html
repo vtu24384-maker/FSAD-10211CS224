@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout — ShopZone</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="nav-logo">SHOP<span>ZONE</span></a>
+  <div class="nav-links">
+    <span style="font-size:0.72rem;color:#555;letter-spacing:0.1em;text-transform:uppercase;" th:text="${userName}"></span>
+  </div>
+</nav>
+
+<div class="page-header">
+  <p style="font-size:0.65rem;letter-spacing:0.2em;color:#444;text-transform:uppercase;margin-bottom:0.5rem;">FINAL STEP</p>
+  <h1 class="page-title">CHECKOUT</h1>
+</div>
+
+<div th:if="${error}" class="alert alert-error" style="margin:1rem 2.5rem;" th:text="${error}"></div>
+
+<div class="checkout-layout">
+
+  <!-- Payment -->
+  <div class="checkout-left">
+    <p class="checkout-section-title">SELECT PAYMENT METHOD</p>
+
+    <form th:action="@{/order/place}" method="post" id="checkout-form">
+
+      <label class="payment-option selected" id="opt-card" onclick="selectPayment('card',this)">
+        <input type="radio" name="paymentMethod" value="card" checked style="display:none;"/>
+        <span class="payment-icon">💳</span>
+        <div>
+          <div class="payment-name">Credit / Debit Card</div>
+          <div class="payment-desc">Visa, Mastercard, Rupay</div>
+        </div>
+      </label>
+
+      <label class="payment-option" id="opt-upi" onclick="selectPayment('upi',this)">
+        <input type="radio" name="paymentMethod" value="upi" style="display:none;"/>
+        <span class="payment-icon">📱</span>
+        <div>
+          <div class="payment-name">UPI</div>
+          <div class="payment-desc">GPay, PhonePe, Paytm</div>
+        </div>
+      </label>
+
+      <label class="payment-option" id="opt-cod" onclick="selectPayment('cod',this)">
+        <input type="radio" name="paymentMethod" value="cod" style="display:none;"/>
+        <span class="payment-icon">🏠</span>
+        <div>
+          <div class="payment-name">Cash on Delivery</div>
+          <div class="payment-desc">Pay when your order arrives</div>
+        </div>
+      </label>
+
+      <!-- Card fields -->
+      <div id="card-fields" class="card-fields">
+        <div class="form-group">
+          <label class="form-label">Card Number</label>
+          <input type="text" id="card-number" maxlength="19" placeholder="1234 5678 9012 3456" class="form-input"/>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Expiry</label>
+            <input type="text" id="card-expiry" maxlength="5" placeholder="MM/YY" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">CVV</label>
+            <input type="password" id="card-cvv" maxlength="3" placeholder="•••" class="form-input"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Name on Card</label>
+          <input type="text" id="card-name" placeholder="Full name" class="form-input"/>
+        </div>
+      </div>
+
+      <!-- UPI -->
+      <div id="upi-fields" style="display:none;" class="card-fields">
+        <div class="form-group">
+          <label class="form-label">UPI ID</label>
+          <input type="text" id="upi-id" placeholder="yourname@upi" class="form-input"/>
+        </div>
+      </div>
+
+      <!-- COD -->
+      <div id="cod-fields" style="display:none;" class="card-fields">
+        <div style="padding:1rem;border:1px solid #1a1a1a;font-size:0.72rem;color:#555;letter-spacing:0.08em;line-height:1.8;">
+          YOU'LL PAY IN CASH WHEN YOUR ORDER IS DELIVERED.<br/>NO ADVANCE PAYMENT NEEDED.
+        </div>
+      </div>
+
+      <div id="pay-alert" class="pay-alert" style="display:none;"></div>
+
+      <button type="button" onclick="submitOrder()" class="btn-primary" style="margin-top:2rem;">
+        PLACE ORDER →
+      </button>
+    </form>
+  </div>
+
+  <!-- Summary -->
+  <div class="checkout-right">
+    <p class="checkout-section-title">ORDER SUMMARY</p>
+    <div th:each="item : ${cartItems}" class="order-item-row">
+      <span class="order-item-name" th:text="${item.product.name + '  ×' + item.quantity}"></span>
+      <span class="order-item-price">₹<span th:text="${#numbers.formatDecimal(item.product.price * item.quantity,1,2)}"></span></span>
+    </div>
+    <div style="margin-top:2rem;">
+      <p class="summary-label">TOTAL</p>
+      <div class="summary-total" style="font-size:2.5rem;">₹<span th:text="${#numbers.formatDecimal(cartTotal,1,2)}"></span></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">SHOPZONE</span>
+  <span class="footer-copy">© 2025 SHOPZONE. ALL RIGHTS RESERVED.</span>
+</footer>
+
+<script>
+  let currentMethod = 'card';
+
+  function selectPayment(method, el) {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type=radio]').checked = true;
+    currentMethod = method;
+    document.getElementById('card-fields').style.display = method === 'card' ? 'block' : 'none';
+    document.getElementById('upi-fields').style.display  = method === 'upi'  ? 'block' : 'none';
+    document.getElementById('cod-fields').style.display  = method === 'cod'  ? 'block' : 'none';
+  }
+
+  document.getElementById('card-number').addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();
+  });
+  document.getElementById('card-expiry').addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'$1/$2');
+  });
+
+  function submitOrder() {
+    const alert = document.getElementById('pay-alert');
+    alert.style.display = 'none';
+    if (currentMethod === 'card') {
+      const num  = document.getElementById('card-number').value.replace(/\s/g,'');
+      const exp  = document.getElementById('card-expiry').value;
+      const cvv  = document.getElementById('card-cvv').value;
+      const name = document.getElementById('card-name').value.trim();
+      if (num.length < 16 || !exp || cvv.length < 3 || !name) {
+        alert.textContent = 'PLEASE FILL IN ALL CARD DETAILS CORRECTLY.';
+        alert.style.display = 'block'; return;
+      }
+    }
+    if (currentMethod === 'upi') {
+      const upi = document.getElementById('upi-id').value.trim();
+      if (!upi.includes('@')) {
+        alert.textContent = 'ENTER A VALID UPI ID.';
+        alert.style.display = 'block'; return;
+      }
+    }
+    document.getElementById('checkout-form').submit();
+  }
+</script>
+</body>
+</html>
